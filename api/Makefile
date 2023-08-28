@@ -1,6 +1,7 @@
 # Definición de variables
-IMAGE_NAME = questhub-api
+IMAGE_NAME = questhub-farm-api
 CONTAINER_NAME = questhub
+RED_NAME = questhub
 PORT = 8000
 
 # Comandos para construir la imagen del contenedor
