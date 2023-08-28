@@ -10,4 +10,4 @@ app.include_router(auth_router)
 
 @app.get('/')
 async def root():
-    return {'message': f'Welcome to {settings.app_name}'}
+    return {'message': f'Welcome to {settings.APP_NAME}'}

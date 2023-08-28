@@ -1,7 +1,11 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
-    app_name: str = "QuestHub API"
+    APP_NAME: str = "QuestHub API"
+
+    ALGORITHM_TOKEN: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30 # 30 minutes
+    REFRESH_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7 # 7 days
 
     # Getting .env variables
     model_config = SettingsConfigDict(
@@ -15,5 +19,7 @@ class Settings(BaseSettings):
     DATABASE_NAME: str
 
     JWT_SECRET_KEY: str # $ openssl rand -base64 24
+    JWT_REFRESH_SECRET_KEY: str
+
 
 settings = Settings()

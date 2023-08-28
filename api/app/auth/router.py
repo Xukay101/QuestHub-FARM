@@ -1,0 +1,61 @@
+from fastapi import APIRouter, HTTPException, Depends
+from fastapi.security import OAuth2PasswordRequestForm
+
+from app.models import User
+from app.database import create_user, get_user_username
+from app.auth.schemas import TokenSchema
+from app.auth.utils import (
+    get_hashed_password,
+    create_access_token,
+    create_refresh_token,
+    verify_password
+)
+
+router = APIRouter(prefix='/auth', tags=['auth'], responses={404: {"description": "Not found"}})
+
+@router.get('/')
+async def root():
+    return {'message': 'this is auth router'}
+
+@router.post('/login', status_code=200, response_model=TokenSchema)
+async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    user = await get_user_username(form_data.username)
+    if not user:
+        raise HTTPException(401, 'Incorrect email or password')
+
+    if not verify_password(form_data.password, user['password']):
+        raise HTTPException(401, 'Incorrect email or password')
+
+    return {
+        'access_token': create_access_token(user['username']),
+        'refresh_token': create_refresh_token(user['username']),
+    }
+
+@router.post('/signup', status_code=201, response_model=User)
+async def signup(user: User):
+    # Check if existing
+    userFound = await get_user_username(user.username)
+    if userFound:
+        raise HTTPException(409, 'User already exists')
+
+    # Convert Password
+    user = user.model_dump()
+    user['password'] = get_hashed_password(user['password'])
+
+    # Create user
+    response = await create_user(user)
+    if response:
+        return response
+
+    raise HTTPException(400, 'Something went wrong')
+
+@router.put('/change-password')
+async def change_password():
+    '''
+    {
+        "current_password": "contraseña_actual",
+        "new_password": "nueva_contraseña"
+    }
+    '''
+    return {'message': 'Password changed successfully.'}
+

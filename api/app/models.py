@@ -1,7 +1,8 @@
 # Global models
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, EmailStr 
 
 class User(BaseModel):
     username: str
-    mail: str
+    email: EmailStr
     password: str
+    is_active: bool = True
