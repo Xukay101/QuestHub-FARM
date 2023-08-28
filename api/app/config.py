@@ -11,6 +11,9 @@ class Settings(BaseSettings):
     )
 
     # Declared .env variables
-    foobar: str
+    DATABASE_URI: str
+    DATABASE_NAME: str
+
+    JWT_SECRET_KEY: str # $ openssl rand -base64 24
 
 settings = Settings()
