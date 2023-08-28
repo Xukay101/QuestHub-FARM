@@ -11,3 +11,11 @@ app.include_router(auth_router)
 @app.get('/')
 async def root():
     return {'message': f'Welcome to {settings.APP_NAME}'}
+
+# temp
+from app.models import User
+from fastapi import Depends
+from app.auth.dependencies import get_current_user
+@app.get('/test')
+async def test(user: User = Depends(get_current_user)):
+    return {'message': 'Test endpoint'}
