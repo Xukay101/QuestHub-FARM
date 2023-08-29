@@ -15,8 +15,8 @@ class Settings(BaseSettings):
     )
 
     # Declared .env variables
-    DATABASE_URI: str
-    DATABASE_NAME: str
+    MONGODB_URI: str
+    MONGODB_NAME: str
 
     JWT_SECRET_KEY: str # $ openssl rand -base64 24
     JWT_REFRESH_SECRET_KEY: str

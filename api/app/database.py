@@ -5,8 +5,8 @@ from app.config import settings
 from app.models import User
 
 # Conections
-client = AsyncIOMotorClient(settings.DATABASE_URI)
-database = client[settings.DATABASE_NAME]
+client = AsyncIOMotorClient(settings.MONGODB_URI)
+database = client[settings.MONGODB_NAME]
 
 # Collections
 users_collection = database['users']
