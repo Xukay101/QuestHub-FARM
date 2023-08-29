@@ -4,6 +4,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from app.models import User
 from app.database import create_user, get_user_username
 from app.auth.schemas import TokenSchema
+from app.auth.dependencies import get_current_user_refresh
 from app.auth.utils import (
     get_hashed_password,
     create_access_token,
@@ -48,6 +49,12 @@ async def signup(user: User):
         return response
 
     raise HTTPException(400, 'Something went wrong')
+
+# This endpoint renew access token
+@router.post("/refresh-token")
+async def refresh_token(user: User = Depends(get_current_user_refresh)):
+    new_access_token = create_access_token(user.username) 
+    return {"access_token": new_access_token}
 
 @router.put('/change-password')
 async def change_password():
