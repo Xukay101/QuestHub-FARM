@@ -1,19 +1,24 @@
 version: '3.8'
 services:
   mongodb:
-    image: mongodb/mongodb-community-server:6.0.6-ubuntu2204
+    image: mongo:4.4.24
     container_name: mongodb
-    environment:
-      - MONGODB_VERSION=4.4.24
     ports:
       - '27017-27019:27017-27019'
+    volumes:
+      - mongo:/data/db
   api:
     build: ./api
     container_name: questhub-api
     environment:
-      - DATABASE_URI=mongodb://mongodb:27017
+      - MONGODB_URI=mongodb://mongodb:27017
+      - MONGODB_NAME=questhub
+      - JWT_SECRET_KEY=E7fsZlgqWTjJfF5fuh0bVFI7ZjlQCeIX
+      - JWT_REFRESH_SECRET_KEY=tUrCfQevEXg2PxqDXz2KVRB5CWd/P5Ws
     ports:
       - '8000:8000'
     depends_on:
       - mongodb
 
+volumes:
+  mongo:
