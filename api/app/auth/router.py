@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 
 from app.models import User
-from app.database import create_user, get_user_username
+from app.database import UserController
 from app.auth.schemas import TokenSchema
 from app.auth.dependencies import get_current_user_refresh
 from app.auth.utils import (
@@ -20,7 +20,7 @@ async def root():
 
 @router.post('/login', status_code=200, response_model=TokenSchema)
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
-    user = await get_user_username(form_data.username)
+    user = await UserController.get_by_username(form_data.username)
     if not user:
         raise HTTPException(401, 'Incorrect email or password')
 
@@ -35,7 +35,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
 @router.post('/signup', status_code=201, response_model=User)
 async def signup(user: User):
     # Check if existing
-    userFound = await get_user_username(user.username)
+    userFound = await UserController.get_by_username(user.username)
     if userFound:
         raise HTTPException(409, 'User already exists')
 
@@ -44,7 +44,7 @@ async def signup(user: User):
     user['password'] = get_hashed_password(user['password'])
 
     # Create user
-    response = await create_user(user)
+    response = await UserController.create(user)
     if response:
         return response
 

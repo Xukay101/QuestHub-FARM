@@ -6,7 +6,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import jwt
 from pydantic import ValidationError, BaseModel
 
-from app.database import get_user_username
+from app.database import UserController
 from app.models import User
 from app.config import settings
 from app.auth.schemas import TokenPayload
@@ -36,7 +36,7 @@ async def get_current_user(token: str = Depends(reuseable_oauth)) -> User:
             headers={"WWW-Authenticate": "Bearer"},
         )
         
-    user: Union[dict[str, Any], None] = await get_user_username(token_data.sub)
+    user: Union[dict[str, Any], None] = await UserController.get_by_username(token_data.sub)
 
     if user is None:
         raise HTTPException(
@@ -66,7 +66,7 @@ async def get_current_user_refresh(token: str = Depends(reuseable_oauth)) -> Use
             headers={"WWW-Authenticate": "Bearer"},
         )
         
-    user: Union[dict[str, Any], None] = await get_user_username(token_data.sub)
+    user: Union[dict[str, Any], None] = await UserController.get_by_username(token_data.sub)
 
     if user is None:
         raise HTTPException(

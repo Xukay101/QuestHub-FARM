@@ -8,38 +8,44 @@ from app.models import User
 client = AsyncIOMotorClient(settings.MONGODB_URI)
 database = client[settings.MONGODB_NAME]
 
-# Collections
-users_collection = database['users']
+# Controllers
+class UserController():
+    collection = database['users']
 
-# Operations
-async def get_user_id(id: str):
-    user = await users_collection.find_one({'_id': ObjectId(id)})
-    return user
+    @classmethod
+    async def get_by_id(cls, id: str):
+        user = await cls.collection.find_one({'_id': ObjectId(id)})
+        return user
 
-async def get_user_username(username: str):
-    user = await users_collection.find_one({'username': username})
-    return user
+    @classmethod
+    async def get_by_username(cls, username: str):
+        user = await cls.collection.find_one({'username': username})
+        return user
 
-async def get_users():
-    users = []
-    cursor = users_collection.find({})
-    async for doc in cursor:
-        users.append(User(**doc))
-    return users
+    @classmethod
+    async def get_users(cls):
+        users = []
+        cursor = cls.collection.find({})
+        async for doc in cursor:
+            users.append(User(**doc))
+        return users
 
-async def create_user(user):
-    new_user = await users_collection.insert_one(user)
-    created_user = await users_collection.find_one({'_id': new_user.inserted_id})
-    created_user['_id'] = str(created_user['_id'])
-    return created_user
+    @classmethod
+    async def create(cls, user):
+        new_user = await cls.collection.insert_one(user)
+        created_user = await cls.collection.find_one({'_id': new_user.inserted_id})
+        created_user['_id'] = str(created_user['_id'])
+        return created_user
 
-async def update_user(id: str, user):
-    await users_collection.update_one({'_id': id}, {'$set': user})
-    document = await users_collection.find_one({'_id': id})
-    return document 
+    @classmethod
+    async def update(cls, id: str, user):
+        await cls.collection.update_one({'_id': id}, {'$set': user})
+        document = await cls.collection.find_one({'_id': id})
+        return document 
 
-async def delete_user(id: str):
-    await users_collection.delete_one({'_id': id})
-    return True 
+    @classmethod
+    async def delete(cls, id: str):
+        await cls.collection.delete_one({'_id': id})
+        return True 
 
 
