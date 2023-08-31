@@ -2,11 +2,13 @@ from fastapi import FastAPI
 
 from app.config import settings
 from app.auth.router import router as auth_router
+from app.questions.router import router as questions_router
 
 app = FastAPI()
 
 # Register routers
 app.include_router(auth_router)
+app.include_router(questions_router)
 
 @app.get('/')
 async def root():
