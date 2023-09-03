@@ -35,3 +35,11 @@ class Answer(BaseModel):
     question_id: str
     created_at: datetime = Field(default_factory=datetime.now)
     updated_at: datetime | None = None
+
+class Admin(BaseModel):
+    id: str | None = None
+    username: str
+    password: str
+    created_at: datetime = Field(default_factory=datetime.now)
+    level: int = 1
+    is_active: bool = True

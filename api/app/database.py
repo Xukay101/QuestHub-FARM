@@ -9,7 +9,7 @@ from motor.motor_asyncio import (
 )
 
 from app.config import settings
-from app.models import User, Question, Answer, Tag
+from app.models import User, Question, Answer, Tag, Admin
 
 # Conections
 client = AsyncIOMotorClient(settings.MONGODB_URI)
@@ -103,3 +103,12 @@ class TagController(BaseController):
     async def get_by_name(cls, name: str) -> dict:
         tag = await cls.collection.find_one({'name': name})
         return tag
+
+class AdminController(BaseController):
+    model = Admin
+    collection = database['admins']
+
+    @classmethod
+    async def get_by_username(cls, username: str) -> dict:
+        user = await cls.collection.find_one({'username': username})
+        return user
