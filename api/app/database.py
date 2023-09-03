@@ -26,9 +26,14 @@ class BaseController:
         return document
 
     @classmethod
-    async def get_all(cls) -> List[BaseModel]:
+    async def get_all(cls, limit: int | None = None) -> List[BaseModel]:
         documents = []
-        cursor: AsyncIOMotorCursor = cls.collection.find({})
+
+        if not limit:
+            cursor: AsyncIOMotorCursor = cls.collection.find({}).sort('created_at', -1)
+        else:
+            cursor: AsyncIOMotorCursor = cls.collection.find({}).sort('created_at', -1).limit(limit)
+
         async for doc in cursor:
             documents.append(cls.model(**doc))
         return documents
@@ -36,20 +41,26 @@ class BaseController:
     @classmethod
     async def create(cls, data: dict) -> dict:
         new_document = await cls.collection.insert_one(data)
-        created_document = await cls.collection.find_one({'_id': new_document.inserted_id})
+        id = new_document.inserted_id
+        created_document = await cls.update(str(id), {'id': str(id)})
         created_document['_id'] = str(created_document['_id'])
         return created_document
 
     @classmethod
     async def update(cls, id: str, data: dict) -> dict:
-        await cls.collection.update_one({'_id': id}, {'$set': data})
-        document = await cls.collection.find_one({'_id': id})
+        await cls.collection.update_one({'_id': ObjectId(id)}, {'$set': data})
+        document = await cls.collection.find_one({'_id': ObjectId(id)})
         return document
 
     @classmethod
     async def delete(cls, id: str) -> bool:
-        result = await cls.collection.delete_one({'_id': id})
+        result = await cls.collection.delete_one({'_id': ObjectId(id)})
         return result.deleted_count > 0
+
+    @classmethod
+    async def get_collection(cls) -> AsyncIOMotorCollection:
+        return cls.collection
+
 
 class UserController(BaseController):
     model = User
@@ -65,6 +76,18 @@ class QuestionController(BaseController):
     collection = database['questions']
 
     @classmethod
+    async def get_by_tag(cls, tag: str, limit: int | None = None) -> List[Question]:
+        if not limit:
+            cursor = cls.collection.find({'tags': {'$in': [tag]}}).sort('created_at', -1)
+        else:
+            cursor = cls.collection.find({'tags': {'$in': [tag]}}).sort('created_at', -1).limit(limit)
+
+        questions = []
+        async for doc in cursor:
+            questions.append(cls.model(**doc))
+        return questions
+
+    @classmethod
     async def get_answers(cls) -> List[Answer]:
         pass
 
@@ -77,5 +100,6 @@ class TagController(BaseController):
     collection = database['tags']
 
     @classmethod
-    async def get_questions(cls) -> List[Question]:
-        pass
+    async def get_by_name(cls, name: str) -> dict:
+        tag = await cls.collection.find_one({'name': name})
+        return tag
