@@ -40,33 +40,36 @@ async def get_question(id: str = Depends(validate_object_id)):
     raise HTTPException(404, 'Question not found.')
 
 @router.get('/{id}/votes', status_code=200, response_model=Question)
-async def manage_votes(id: str = Depends(validate_object_id), vote: str | None = None):
-    question = await QuestionController.get_by_id(id)
-    if not question:
+async def manage_votes(
+    id: str = Depends(validate_object_id),
+    vote: str | None = None,
+    user: User = Depends(get_current_user)
+):
+    question_found = await QuestionController.get_by_id(id)
+    if not question_found:
         raise HTTPException(404, 'Question not found.')
 
-    if vote == 'up':
-        question['votes'] += 1
-    elif vote == 'down':
-        question['votes'] -= 1
-    else:
-        raise HTTPException(status_code=400, detail="Invalid vote value")
+    if vote in ('up', 'down'):
+        response = await QuestionController.add_vote(id, user.id, vote)
+        if response:
+            return response
+        raise HTTPException(422, 'The request could not be processed.')
+    elif vote == 'remove':
+        response = await QuestionController.remove_vote(id, user.id)
+        if response:
+            return response
+        raise HTTPException(422, 'The request could not be processed.')
 
-    response = await QuestionController.update(id, {'votes': question['votes']})
-    if response:
-        return question
+    raise HTTPException(status_code=400, detail="Invalid vote value")
 
-    raise HTTPException(422, 'The request could not be processed.')
- 
 @router.post('/ask', status_code=201, response_model=Question)
 async def create_question(
     question: Question,
     user: User = Depends(get_current_user)
 ):
-    for tag in question.tags:
-        response = await TagController.get_by_name(tag)
-        if not response:
-            raise HTTPException(400, 'Error within the tags.')
+    response = await TagController.get_by_name(question.tag)
+    if not response:
+        raise HTTPException(400, 'The tag does not exist.')
 
     question.author_id = user.id
     question = question.model_dump()
@@ -101,9 +104,12 @@ async def delete_question(
     id: str = Depends(validate_object_id),
     user: User = Depends(get_current_user)
 ):
-    response = await QuestionController.get_by_id(id)
-    if not response:
+    question = await QuestionController.get_by_id(id)
+    if not question:
         raise HTTPException(404, 'Question not found.')
+
+    if question['author_id'] != user.id:
+        raise HTTPException(status_code=403, detail="You do not have permission to delete this question.")
 
     response = await QuestionController.delete(id)
     if response:

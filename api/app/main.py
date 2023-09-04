@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi_pagination import add_pagination
+from fastapi_pagination.utils import disable_installed_extensions_check
 
 from app.config import settings
 from app.auth.router import router as auth_router
@@ -15,6 +16,7 @@ app.include_router(admin_router)
 
 # Add pagination
 add_pagination(app)
+disable_installed_extensions_check()
 
 # Root Endpoint
 @app.get('/')
