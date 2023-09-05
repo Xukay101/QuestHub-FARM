@@ -9,7 +9,7 @@ from motor.motor_asyncio import (
 )
 
 from app.config import settings
-from app.models import User, Question, Answer, Tag
+from app.models import User, Question, Answer, Tag, Admin
 
 # Conections
 client = AsyncIOMotorClient(settings.MONGODB_URI)
@@ -78,14 +78,34 @@ class QuestionController(BaseController):
     @classmethod
     async def get_by_tag(cls, tag: str, limit: int | None = None) -> List[Question]:
         if not limit:
-            cursor = cls.collection.find({'tags': {'$in': [tag]}}).sort('created_at', -1)
+            cursor = cls.collection.find({'tag': tag}).sort('created_at', -1)
         else:
-            cursor = cls.collection.find({'tags': {'$in': [tag]}}).sort('created_at', -1).limit(limit)
+            cursor = cls.collection.find({'tag': tag}).sort('created_at', -1).limit(limit)
 
         questions = []
         async for doc in cursor:
             questions.append(cls.model(**doc))
         return questions
+
+    @classmethod
+    async def add_vote(cls, question_id: str, user_id: str, vote_type: str) -> dict:
+        question = await cls.get_by_id(question_id)
+
+        question['votes'][user_id] = vote_type 
+        response = await cls.update(question_id, {'votes': question['votes']})
+        if response:
+            return response
+
+
+    @classmethod
+    async def remove_vote(cls, question_id: str, user_id: str) -> bool:
+        question = await cls.get_by_id(question_id)
+
+        if user_id in question['votes']:
+            question['votes'].pop(user_id)
+            response = await cls.update(question_id, {'votes': question['votes']})
+            if response:
+                return response
 
     @classmethod
     async def get_answers(cls) -> List[Answer]:
@@ -103,3 +123,12 @@ class TagController(BaseController):
     async def get_by_name(cls, name: str) -> dict:
         tag = await cls.collection.find_one({'name': name})
         return tag
+
+class AdminController(BaseController):
+    model = Admin
+    collection = database['admins']
+
+    @classmethod
+    async def get_by_username(cls, username: str) -> dict:
+        user = await cls.collection.find_one({'username': username})
+        return user

@@ -22,10 +22,10 @@ async def root():
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     user = await UserController.get_by_username(form_data.username)
     if not user:
-        raise HTTPException(401, 'Incorrect email or password')
+        raise HTTPException(401, 'Incorrect username or password')
 
     if not verify_password(form_data.password, user['password']):
-        raise HTTPException(401, 'Incorrect email or password')
+        raise HTTPException(401, 'Incorrect username or password')
 
     return {
         'access_token': create_access_token(user['username']),

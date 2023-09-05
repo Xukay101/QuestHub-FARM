@@ -16,8 +16,8 @@ class Question(BaseModel):
     id: str | None = None
     title: str | None = None
     content: str | None = None
-    tags: List[str] = []
-    votes: int = 0
+    tag: str | None = None
+    votes: dict = {}
     author_id: str = None
     created_at: datetime = Field(default_factory=datetime.now)
     updated_at: datetime | None = None
@@ -35,3 +35,11 @@ class Answer(BaseModel):
     question_id: str
     created_at: datetime = Field(default_factory=datetime.now)
     updated_at: datetime | None = None
+
+class Admin(BaseModel):
+    id: str | None = None
+    username: str
+    password: str
+    created_at: datetime = Field(default_factory=datetime.now)
+    level: int = 1
+    is_active: bool = True
