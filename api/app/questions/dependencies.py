@@ -1,4 +1,3 @@
-# Global dependencies
 from fastapi import HTTPException
 from bson import ObjectId
 

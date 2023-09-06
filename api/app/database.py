@@ -107,13 +107,36 @@ class QuestionController(BaseController):
             if response:
                 return response
 
-    @classmethod
-    async def get_answers(cls) -> List[Answer]:
-        pass
-
 class AnswerController(BaseController):
     model = Answer
     collection = database['answers']
+
+    @classmethod
+    async def add_vote(cls, answer_id: str, user_id: str, vote_type: str) -> dict:
+        question = await cls.get_by_id(answer_id)
+
+        question['votes'][user_id] = vote_type 
+        response = await cls.update(answer_id, {'votes': question['votes']})
+        if response:
+            return response
+
+    @classmethod
+    async def remove_vote(cls, answer_id: str, user_id: str) -> bool:
+        question = await cls.get_by_id(answer_id)
+
+        if user_id in question['votes']:
+            question['votes'].pop(user_id)
+            response = await cls.update(answer_id, {'votes': question['votes']})
+            if response:
+                return response
+
+    @classmethod
+    async def get_by_question(cls, question_id: str) -> List[Answer]:
+        cursor = cls.collection.find({'question_id': question_id}).sort('created_at', -1)
+        answers = []
+        async for doc in cursor:
+            answers.append(cls.model(**doc))
+        return answers
 
 class TagController(BaseController):
     model = Tag
