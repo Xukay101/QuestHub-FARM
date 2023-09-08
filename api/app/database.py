@@ -9,7 +9,7 @@ from motor.motor_asyncio import (
 )
 
 from app.config import settings
-from app.models import User, Question, Answer, Tag, Admin
+from app.models import User, UserSettings, Question, Answer, Tag, Admin
 
 # Conections
 client = AsyncIOMotorClient(settings.MONGODB_URI)
@@ -88,6 +88,18 @@ class QuestionController(BaseController):
         return questions
 
     @classmethod
+    async def get_by_author(cls, author_id: str, limit: int | None = None) -> List[Question]:
+        if not limit:
+            cursor = cls.collection.find({'author_id': author_id}).sort('created_at', -1)
+        else:
+            cursor = cls.collection.find({'author_id': author_id}).sort('created_at', -1).limit(limit)
+
+        questions = []
+        async for doc in cursor:
+            questions.append(cls.model(**doc))
+        return questions
+
+    @classmethod
     async def add_vote(cls, question_id: str, user_id: str, vote_type: str) -> dict:
         question = await cls.get_by_id(question_id)
 
@@ -138,6 +150,18 @@ class AnswerController(BaseController):
             answers.append(cls.model(**doc))
         return answers
 
+    @classmethod
+    async def get_by_author(cls, author_id: str, limit: int | None = None) -> List[Answer]:
+        if not limit:
+            cursor = cls.collection.find({'author_id': author_id}).sort('created_at', -1)
+        else:
+            cursor = cls.collection.find({'author_id': author_id}).sort('created_at', -1).limit(limit)
+
+        answers = []
+        async for doc in cursor:
+            answers.append(cls.model(**doc))
+        return answers
+
 class TagController(BaseController):
     model = Tag
     collection = database['tags']
@@ -155,3 +179,7 @@ class AdminController(BaseController):
     async def get_by_username(cls, username: str) -> dict:
         user = await cls.collection.find_one({'username': username})
         return user
+
+class UserSettingsController(BaseController):
+    model = UserSettings 
+    collection = database['users_settings']
