@@ -3,10 +3,10 @@ from datetime import datetime
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi_pagination import Page, paginate
 
-from app.models import User, Question
-from app.database import QuestionController, TagController
-from app.dependencies import validate_object_id
+from app.models import User, Question, Answer
+from app.database import QuestionController, TagController, AnswerController
 from app.auth.dependencies import get_current_user
+from app.questions.dependencies import validate_object_id
 
 router = APIRouter(
     prefix='/questions', 
@@ -15,18 +15,11 @@ router = APIRouter(
 )
 
 @router.get('/', status_code=200, response_model=Page[Question])
-async def get_questions(limit: int = 1000, tag: str | None = None):
+async def get_recent_questions(limit: int = 1000):
     if limit <= 0:
         raise HTTPException(400, "The 'limit' parameter cannot be a negative number.")
 
-    if tag:
-        response = await TagController.get_by_name(tag)
-        if not response:
-            raise HTTPException(400, 'The tag does not exist.')
-
-        questions = await QuestionController.get_by_tag(tag, limit)
-    else:
-        questions = await QuestionController.get_all(limit)
+    questions = await QuestionController.get_all(limit)
 
     return paginate(questions)
     
@@ -117,6 +110,14 @@ async def delete_question(
 
     raise HTTPException(status_code=500, detail='Failed to delete question data.')
 
-@router.get('/{id}/answers', status_code=200) # Incompleted
+@router.get('/{id}/answers', status_code=200, response_model=Page[Answer])
 async def get_answers(id: str = Depends(validate_object_id)):
-    return {'message': 'Hello World'}
+    question_found = await QuestionController.get_by_id(id)
+    if not question_found:
+        raise HTTPException(404, 'Question not found.')
+
+    answers = await AnswerController.get_by_question(id)
+    if not answers:
+        raise HTTPException(status_code=500, detail='Failed to get answers data.')
+
+    return paginate(answers)

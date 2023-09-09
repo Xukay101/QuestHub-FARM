@@ -1,16 +1,25 @@
 # Global models
-from typing import List
 from datetime import datetime
 
 from pydantic import BaseModel, EmailStr, Field
+
+from app.constants import PrivacyLevelEnum, ThemeEnum, LanguageEnum
 
 class User(BaseModel):
     id: str | None = None
     username: str
     email: EmailStr
     password: str
+    settings_id: str = None
     created_at: datetime = Field(default_factory=datetime.now)
     is_active: bool = True
+
+class UserSettings(BaseModel):
+    id: str | None = None
+    notifications_enabled: bool
+    privacy_level: PrivacyLevelEnum
+    theme: ThemeEnum
+    language: LanguageEnum
 
 class Question(BaseModel):
     id: str | None = None
@@ -31,8 +40,10 @@ class Tag(BaseModel):
 
 class Answer(BaseModel):
     id: str | None = None
-    content: str
-    question_id: str
+    content: str | None = None
+    question_id: str | None = None
+    author_id: str | None = None
+    votes: dict = {}
     created_at: datetime = Field(default_factory=datetime.now)
     updated_at: datetime | None = None
 

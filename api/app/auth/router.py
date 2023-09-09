@@ -1,8 +1,9 @@
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 
-from app.models import User
-from app.database import UserController
+from app.models import User, UserSettings
+from app.database import UserController, UserSettingsController
+from app.constants import PrivacyLevelEnum, ThemeEnum, LanguageEnum
 from app.auth.schemas import TokenSchema
 from app.auth.dependencies import get_current_user_refresh
 from app.auth.utils import (
@@ -40,11 +41,20 @@ async def signup(user: User):
         raise HTTPException(409, 'User already exists')
 
     # Convert Password
-    user = user.model_dump()
-    user['password'] = get_hashed_password(user['password'])
+    user.password = get_hashed_password(user.password)
+
+    # Define settings
+    user_settings = UserSettings(
+        notifications_enabled=True,
+        privacy_level=PrivacyLevelEnum.PUBLIC,
+        theme=ThemeEnum.LIGHT,
+        language=LanguageEnum.ENGLISH
+    )
+    user_settings = await UserSettingsController.create(user_settings.model_dump())
+    user.settings_id = user_settings['id']
 
     # Create user
-    response = await UserController.create(user)
+    response = await UserController.create(user.model_dump())
     if response:
         return response
 

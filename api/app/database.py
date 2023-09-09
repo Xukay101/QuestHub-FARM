@@ -1,3 +1,5 @@
+import re
+
 from typing import List
 
 from pydantic import BaseModel
@@ -9,7 +11,7 @@ from motor.motor_asyncio import (
 )
 
 from app.config import settings
-from app.models import User, Question, Answer, Tag, Admin
+from app.models import User, UserSettings, Question, Answer, Tag, Admin
 
 # Conections
 client = AsyncIOMotorClient(settings.MONGODB_URI)
@@ -88,6 +90,18 @@ class QuestionController(BaseController):
         return questions
 
     @classmethod
+    async def get_by_author(cls, author_id: str, limit: int | None = None) -> List[Question]:
+        if not limit:
+            cursor = cls.collection.find({'author_id': author_id}).sort('created_at', -1)
+        else:
+            cursor = cls.collection.find({'author_id': author_id}).sort('created_at', -1).limit(limit)
+
+        questions = []
+        async for doc in cursor:
+            questions.append(cls.model(**doc))
+        return questions
+
+    @classmethod
     async def add_vote(cls, question_id: str, user_id: str, vote_type: str) -> dict:
         question = await cls.get_by_id(question_id)
 
@@ -108,12 +122,71 @@ class QuestionController(BaseController):
                 return response
 
     @classmethod
-    async def get_answers(cls) -> List[Answer]:
-        pass
+    async def search_by_args(cls, q: str | None = None, tag: str | None = None, user: str | None = None):
+        query = {}
+
+        if q:
+            words = q.split()
+            regex_pattern = '|'.join(re.escape(word) for word in words)
+            query['title'] = {'$regex': regex_pattern, '$options': 'i'} 
+
+        if tag:
+            query['tag'] = tag
+
+        if user:
+            user = await UserController.get_by_username(user)
+            if user:
+                query['author_id'] = user['id']
+
+        questions = []
+        cursor = cls.collection.find(query).sort('created_at', -1)
+        async for doc in cursor:
+            questions.append(cls.model(**doc))
+
+        return questions
 
 class AnswerController(BaseController):
     model = Answer
     collection = database['answers']
+
+    @classmethod
+    async def add_vote(cls, answer_id: str, user_id: str, vote_type: str) -> dict:
+        question = await cls.get_by_id(answer_id)
+
+        question['votes'][user_id] = vote_type 
+        response = await cls.update(answer_id, {'votes': question['votes']})
+        if response:
+            return response
+
+    @classmethod
+    async def remove_vote(cls, answer_id: str, user_id: str) -> bool:
+        question = await cls.get_by_id(answer_id)
+
+        if user_id in question['votes']:
+            question['votes'].pop(user_id)
+            response = await cls.update(answer_id, {'votes': question['votes']})
+            if response:
+                return response
+
+    @classmethod
+    async def get_by_question(cls, question_id: str) -> List[Answer]:
+        cursor = cls.collection.find({'question_id': question_id}).sort('created_at', -1)
+        answers = []
+        async for doc in cursor:
+            answers.append(cls.model(**doc))
+        return answers
+
+    @classmethod
+    async def get_by_author(cls, author_id: str, limit: int | None = None) -> List[Answer]:
+        if not limit:
+            cursor = cls.collection.find({'author_id': author_id}).sort('created_at', -1)
+        else:
+            cursor = cls.collection.find({'author_id': author_id}).sort('created_at', -1).limit(limit)
+
+        answers = []
+        async for doc in cursor:
+            answers.append(cls.model(**doc))
+        return answers
 
 class TagController(BaseController):
     model = Tag
@@ -132,3 +205,7 @@ class AdminController(BaseController):
     async def get_by_username(cls, username: str) -> dict:
         user = await cls.collection.find_one({'username': username})
         return user
+
+class UserSettingsController(BaseController):
+    model = UserSettings 
+    collection = database['users_settings']
