@@ -1,3 +1,5 @@
+import re
+
 from typing import List
 
 from pydantic import BaseModel
@@ -118,6 +120,30 @@ class QuestionController(BaseController):
             response = await cls.update(question_id, {'votes': question['votes']})
             if response:
                 return response
+
+    @classmethod
+    async def search_by_args(cls, q: str | None = None, tag: str | None = None, user: str | None = None):
+        query = {}
+
+        if q:
+            words = q.split()
+            regex_pattern = '|'.join(re.escape(word) for word in words)
+            query['title'] = {'$regex': regex_pattern, '$options': 'i'} 
+
+        if tag:
+            query['tag'] = tag
+
+        if user:
+            user = await UserController.get_by_username(user)
+            if user:
+                query['author_id'] = user['id']
+
+        questions = []
+        cursor = cls.collection.find(query).sort('created_at', -1)
+        async for doc in cursor:
+            questions.append(cls.model(**doc))
+
+        return questions
 
 class AnswerController(BaseController):
     model = Answer

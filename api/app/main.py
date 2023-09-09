@@ -9,6 +9,7 @@ from app.admin.router import router as admin_router
 from app.answers.router import router as answers_router
 from app.tags.router import router as tags_router 
 from app.users.router import router as users_router
+from app.search.router import router as search_router 
 
 app = FastAPI()
 
@@ -19,6 +20,7 @@ app.include_router(admin_router)
 app.include_router(answers_router)
 app.include_router(tags_router)
 app.include_router(users_router)
+app.include_router(search_router)
 
 # Add pagination
 add_pagination(app)
