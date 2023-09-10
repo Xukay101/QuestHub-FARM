@@ -19,6 +19,14 @@ services:
       - '8000:8000'
     depends_on:
       - mongodb
+  client:
+    build: ./client
+    container_name: questhub-client
+    ports:
+      - '3000:3000'
+    depends_on:
+      - api
+      
 
 volumes:
   mongo:
