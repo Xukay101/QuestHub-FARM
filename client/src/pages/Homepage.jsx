@@ -1,6 +1,13 @@
+import { NavbarDefault } from "../components/Navbar"
+
 function Homepage() {
   return (
-    <div>Homepage</div>
+    <div>
+      <header className="">
+        <NavbarDefault />
+      </header>
+      Homepage
+    </div>
   )
 }
 

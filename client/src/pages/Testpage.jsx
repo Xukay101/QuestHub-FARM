@@ -1,11 +1,13 @@
-import { Button } from 'antd';
+import { NavbarDefault } from "../components/Navbar"
 
 function Testpage() {
+
   return (
     <div>
-
-      <Button type="primary">Button</Button> 
-
+      <header className="">
+        <NavbarDefault />
+      </header>
+      Testpage
     </div>
   )
 }
