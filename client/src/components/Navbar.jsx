@@ -27,7 +27,7 @@ export function NavbarDefault() {
         color="blue-gray"
         className="p-1 font-normal"
       >
-        <a href="#" className="flex items-center transition-transform hover:text-blue-500">
+        <a href="/" className="flex items-center transition-transform hover:text-blue-500">
           Home
         </a>
       </Typography>
@@ -69,41 +69,46 @@ export function NavbarDefault() {
       <div className="flex items-center justify-between">
 
         <div className="flex items-center gap-4">
-        <Typography
-          as="a"
-          href="#"
-          className="mr-4 cursor-pointer py-1.5 font-bold"
-        >
-          Questhub
-        </Typography>
+          <Typography
+            as="a"
+            href="/"
+            className="mr-4 cursor-pointer py-1.5 font-bold"
+          >
+            Questhub
+          </Typography>
           <div className="mr-4 hidden lg:block">{navList}</div>
 
         </div>
 
-          <div className="hidden lg:inline-block">
+        <div className="hidden lg:inline-block">
           <Searchbar />
-          </div>
+        </div>
 
         <div className="flex items-center gap-4">
 
-          <Button
-            variant="outlined"
-            size="sm"
-            ripple={true}
-            className="hidden lg:inline-block"
-            color="black"
-          >
-            <span>LOG IN</span>
-          </Button>
-          <Button
-            variant="filled"
-            size="sm"
-            ripple={true}
-            className="hidden lg:inline-block"
-            color="black"
-          >
-            <span>SIGN UP</span>
-          </Button>
+          <a href="/auth/login">
+            <Button
+              variant="outlined"
+              size="sm"
+              ripple={true}
+              className="hidden lg:inline-block"
+              color="black"
+            >
+              <span>LOG IN</span>
+            </Button>
+          </a>
+
+          <a href="/auth/register">
+            <Button
+              variant="filled"
+              size="sm"
+              ripple={true}
+              className="hidden lg:inline-block"
+              color="black"
+            >
+              <span>SIGN UP</span>
+            </Button>
+          </a>
         </div>
 
         <IconButton
@@ -129,27 +134,31 @@ export function NavbarDefault() {
         </div>
 
         <div className="flex w-full flex-nowrap items-center gap-2 lg:hidden">
-          <Button
-            fullWidth
-            variant="outlined"
-            size="sm"
-            ripple={true}
-            className="mb-2"
-            color="black"
-          >
-            <span>LOG IN</span>
-          </Button>
+          <a href="/auth/login">
+            <Button
+              fullWidth
+              variant="outlined"
+              size="sm"
+              ripple={true}
+              className="mb-2"
+              color="black"
+            >
+              <span>LOG IN</span>
+            </Button>
+          </a>
 
-          <Button
-            fullWidth
-            variant="filled"
-            size="sm"
-            ripple={true}
-            className="mb-2"
-            color="black"
-          >
-            <span>SIGN UP</span>
-          </Button>
+          <a href="/auth/register">
+            <Button
+              fullWidth
+              variant="filled"
+              size="sm"
+              ripple={true}
+              className="mb-2"
+              color="black"
+            >
+              <span>SIGN UP</span>
+            </Button>
+          </a>
         </div>
 
       </MobileNav>
