@@ -8,8 +8,12 @@ import {
 } from "@material-tailwind/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Searchbar } from "./Searchbar";
+import { isAuthenticated } from "../utils/tokenUtils";
+import ProfileMenu from "./ProfileMenu";
 
 export function NavbarDefault() {
+  const isLoggedIn = isAuthenticated()
+
   const [openNav, setOpenNav] = React.useState(false);
 
   React.useEffect(() => {
@@ -84,36 +88,9 @@ export function NavbarDefault() {
           <Searchbar />
         </div>
 
-        <div className="flex items-center gap-4">
-
-          <a href="/auth/login">
-            <Button
-              variant="outlined"
-              size="sm"
-              ripple={true}
-              className="hidden lg:inline-block"
-              color="black"
-            >
-              <span>LOG IN</span>
-            </Button>
-          </a>
-
-          <a href="/auth/register">
-            <Button
-              variant="filled"
-              size="sm"
-              ripple={true}
-              className="hidden lg:inline-block"
-              color="black"
-            >
-              <span>SIGN UP</span>
-            </Button>
-          </a>
-        </div>
-
         <IconButton
           variant="text"
-          className="ml-auto h-6 w-6 text-inherit hover:bg-transparent focus:bg-transparent active:bg-transparent lg:hidden"
+          className="ml-auto mr-3 h-6 w-6 text-inherit hover:bg-transparent focus:bg-transparent active:bg-transparent lg:hidden"
           ripple={false}
           onClick={() => setOpenNav(!openNav)}
         >
@@ -124,6 +101,46 @@ export function NavbarDefault() {
           )}
         </IconButton>
 
+        <div className="flex items-center gap-4">
+
+          {isLoggedIn ? (
+
+            <>
+              <div className="w-full flex items-end">
+                <ProfileMenu />
+              </div>
+            </>
+
+          ) : (
+
+            <>
+              <a href="/auth/login">
+                <Button
+                  variant="outlined"
+                  size="sm"
+                  ripple={true}
+                  className="hidden lg:inline-block"
+                  color="black"
+                >
+                  <span>LOG IN</span>
+                </Button>
+              </a><a href="/auth/register">
+                <Button
+                  variant="filled"
+                  size="sm"
+                  ripple={true}
+                  className="hidden lg:inline-block"
+                  color="black"
+                >
+                  <span>SIGN UP</span>
+                </Button>
+              </a>
+            </>
+
+          )}
+
+        </div>
+
       </div>
       <MobileNav open={openNav}>
 
@@ -133,33 +150,39 @@ export function NavbarDefault() {
           <Searchbar fullWidth />
         </div>
 
-        <div className="flex w-full flex-nowrap items-center gap-2 lg:hidden">
-          <a href="/auth/login">
-            <Button
-              fullWidth
-              variant="outlined"
-              size="sm"
-              ripple={true}
-              className="mb-2"
-              color="black"
-            >
-              <span>LOG IN</span>
-            </Button>
-          </a>
+        {!isLoggedIn && (
 
-          <a href="/auth/register">
-            <Button
-              fullWidth
-              variant="filled"
-              size="sm"
-              ripple={true}
-              className="mb-2"
-              color="black"
-            >
-              <span>SIGN UP</span>
-            </Button>
-          </a>
-        </div>
+          <>
+            <div className="flex w-full flex-nowrap items-center gap-2 lg:hidden">
+              <a href="/auth/login">
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  size="sm"
+                  ripple={true}
+                  className="mb-2"
+                  color="black"
+                >
+                  <span>LOG IN</span>
+                </Button>
+              </a>
+
+              <a href="/auth/register">
+                <Button
+                  fullWidth
+                  variant="filled"
+                  size="sm"
+                  ripple={true}
+                  className="mb-2"
+                  color="black"
+                >
+                  <span>SIGN UP</span>
+                </Button>
+              </a>
+            </div>
+          </>
+
+        )}
 
       </MobileNav>
     </Navbar>

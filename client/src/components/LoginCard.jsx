@@ -10,7 +10,7 @@ import {
   Button,
 } from "@material-tailwind/react";
 import { useNavigate } from "react-router-dom";
-import isTokenExpired from "../utils/tokenUtils";
+import { isTokenExpired } from "../utils/tokenUtils";
 
 export function LoginCard() {
   const [username, setUsername] = useState("");
