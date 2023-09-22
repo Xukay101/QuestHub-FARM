@@ -14,6 +14,9 @@ class Settings(BaseSettings):
         extra='ignore'
     )
 
+    # Frontend URL
+    CLIENT_URL: str
+
     # Declared .env variables
     MONGODB_URI: str
     MONGODB_NAME: str
