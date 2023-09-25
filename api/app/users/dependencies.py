@@ -9,3 +9,10 @@ async def get_user_by_username(username: str):
         return User(**user)
 
     raise HTTPException(status_code=404, detail="Could not find user")
+
+async def get_user_by_id(id: str):
+    user = await UserController.get_by_id(id)
+    if user:
+        return User(**user)
+
+    raise HTTPException(status_code=404, detail="Could not find user")

@@ -4,7 +4,7 @@ from fastapi_pagination import Page, paginate
 from app.database import QuestionController, AnswerController, UserSettingsController
 from app.models import User, Question, Answer, UserSettings
 from app.users.schemas import UserPublic
-from app.users.dependencies import get_user_by_username
+from app.users.dependencies import get_user_by_username, get_user_by_id
 from app.auth.dependencies import get_current_user
 
 router = APIRouter(
@@ -44,4 +44,8 @@ async def get_user_settings(
     user_settings = await UserSettingsController.get_by_id(current_user.settings_id)
     return user_settings
 
+@router.get('/{id}/username', status_code=200)
+async def get_username(requested_user: User = Depends(get_user_by_id)):
+    username = requested_user.username
+    return {'username': username}
 
