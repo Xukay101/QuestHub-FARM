@@ -14,8 +14,7 @@ export function RegisterCard() {
     <Card className="w-96">
       <CardHeader
         variant="filling"
-        color="orange"
-        className="mb-4 grid h-28 place-items-center"
+        className="mb-4 grid h-28 place-items-center bg-color2"
       >
         <Typography variant="h3" color="white">
           Sign Up

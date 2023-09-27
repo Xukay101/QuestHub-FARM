@@ -10,7 +10,7 @@ import {
   Button,
 } from "@material-tailwind/react";
 import { useNavigate } from "react-router-dom";
-import isTokenExpired from "../utils/tokenUtils";
+import { isTokenExpired } from "../utils/tokenUtils";
 
 export function LoginCard() {
   const [username, setUsername] = useState("");
@@ -79,8 +79,7 @@ export function LoginCard() {
     <Card className="w-96">
       <CardHeader
         variant="filling"
-        color="orange"
-        className="mb-4 grid h-28 place-items-center"
+        className="mb-4 grid h-28 place-items-center bg-color3"
       >
         <Typography variant="h3" color="white">
           Sign In
