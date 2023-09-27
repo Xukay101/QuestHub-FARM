@@ -22,7 +22,7 @@ const logout = (navigate) => {
     localStorage.removeItem('userData');
     sessionStorage.removeItem('userData');
 
-    navigate('/auth/login');
+    navigate('/auth/login')
 }
 
 

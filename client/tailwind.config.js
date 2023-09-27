@@ -15,11 +15,10 @@ export default {
       xl: '1440px',
     },
     colors: {
-      'blue': '#1e3d59',
-      'cream': '#f5f0e1',
-      'orange': '#ff6e40',
-      'yellow': '#ffc13b',
-      'black': '#111111',
+      'color1': '#4A6163',
+      'color2': '#f17a7e',
+      'color3': '#ffc94b',
+      'color4': '#f9a66c',
     },
     fontFamily: {
       sans: ['Graphik', 'sans-serif'],

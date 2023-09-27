@@ -69,7 +69,7 @@ export function NavbarDefault() {
   );
 
   return (
-    <Navbar className="bg-cream shadow-none border-0 border-b-4 border-blue-800 text-black rounded-none py-2 px-4 lg:px-8 lg:py-4">
+    <Navbar className="bg-color1 shadow-none border-0 border-b-4 rounded-none py-2 px-4 lg:px-8 lg:py-4">
       <div className="flex items-center justify-between">
 
         <div className="flex items-center gap-4">
@@ -90,7 +90,7 @@ export function NavbarDefault() {
 
         <IconButton
           variant="text"
-          className="ml-auto mr-3 h-6 w-6 text-inherit hover:bg-transparent focus:bg-transparent active:bg-transparent lg:hidden"
+          className="ml-auto h-6 w-6 text-inherit hover:bg-transparent focus:bg-transparent active:bg-transparent lg:hidden"
           ripple={false}
           onClick={() => setOpenNav(!openNav)}
         >
@@ -101,12 +101,12 @@ export function NavbarDefault() {
           )}
         </IconButton>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center lg:gap-4">
 
           {isLoggedIn ? (
 
             <>
-              <div className="w-full flex items-end">
+              <div className="w-full flex items-end ml-3">
                 <ProfileMenu />
               </div>
             </>
@@ -130,7 +130,7 @@ export function NavbarDefault() {
                   size="sm"
                   ripple={true}
                   className="hidden lg:inline-block"
-                  color="black"
+                  color="red"
                 >
                   <span>SIGN UP</span>
                 </Button>
@@ -153,8 +153,8 @@ export function NavbarDefault() {
         {!isLoggedIn && (
 
           <>
-            <div className="flex w-full flex-nowrap items-center gap-2 lg:hidden">
-              <a href="/auth/login">
+            <div className="flex flex-nowrap items-center gap-2 lg:hidden">
+              <a href="/auth/login" className="grow">
                 <Button
                   fullWidth
                   variant="outlined"
@@ -167,14 +167,14 @@ export function NavbarDefault() {
                 </Button>
               </a>
 
-              <a href="/auth/register">
+              <a href="/auth/register" className="grow">
                 <Button
                   fullWidth
                   variant="filled"
                   size="sm"
                   ripple={true}
                   className="mb-2"
-                  color="black"
+                  color="red"
                 >
                   <span>SIGN UP</span>
                 </Button>

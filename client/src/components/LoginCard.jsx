@@ -79,8 +79,7 @@ export function LoginCard() {
     <Card className="w-96">
       <CardHeader
         variant="filling"
-        color="orange"
-        className="mb-4 grid h-28 place-items-center"
+        className="mb-4 grid h-28 place-items-center bg-color3"
       >
         <Typography variant="h3" color="white">
           Sign In
